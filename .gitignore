@@ -1,3 +1,6 @@
 .idea
 nginx-unit-generator.iml
 config.json
+!config/default.json
+config/*.json
+node_modules

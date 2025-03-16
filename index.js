@@ -1,27 +1,14 @@
+const c = require('config');
 const fs = require('fs');
 
-const sites = [
-    {host: "test.com", php_ver: "8.3", sub_dir: "", user: "test"},
-    {host: "staging.test.com", php_ver: "8.3", sub_dir: "", user: "test-staging"},
-];
+const sites = c.sites;
 
 const getAppName = site => `${site.host}${site.sub_dir.replace(/\//g, "--")}`;
 
-const config = {
-    //   settings: {http: {log_route: false}},
-    listeners: {
-
-        "127.0.0.1:8305": {
-            pass: "routes",
-            forwarded: {
-                client_ip: "X-Forwarded-For",
-                protocol: 'https',
-                source: ["127.0.0.1"]
-            }
-        }
-    },
-    routes: [
-        ...sites.flatMap(site => [
+const createRoutes = sites => {
+    const routes = {};
+    for (const site of sites) {
+        routes[site.host] = [
             {
                 match: {
                     host: site.host,
@@ -48,8 +35,26 @@ const config = {
                     }
                 }
             }
-        ])
-    ],
+        ];
+    }
+    return routes;
+
+};
+
+const config = {
+    //   settings: {http: {log_route: false}},
+    listeners: {
+
+        "127.0.0.1:8305": {
+            pass: "routes/$host",
+            forwarded: {
+                client_ip: "X-Forwarded-For",
+                protocol: 'https',
+                source: ["127.0.0.1"]
+            }
+        }
+    },
+    routes: createRoutes(sites),
     applications: Object.fromEntries(
         sites.map(site => [
             getAppName(site),
@@ -63,6 +68,11 @@ const config = {
                 targets: {
                     direct: {root: `/home/${site.user || getAppName(site)}/htdocs/${site.host}`},
                     index: {root: `/home/${site.user || getAppName(site)}/htdocs/${site.host}`, script: "index.php"}
+                },
+                environment: {
+                    HOME: `/home/${site.user}`,
+                    USER: `${site.user}`,
+                    PHP_VALUE: `\nerror_log=\/home\/${site.user}\/logs\/php\/error.log;\nmemory_limit=512M;\nmax_execution_time=60;\nmax_input_time=60;\nmax_input_vars=10000;\npost_max_size=64M;\nupload_max_filesize=64M;\nauto_prepend_file=\/home\/${site.user}\/.varnish-cache\/controller.php;\ndate.timezone=UTC;\ndisplay_errors=off;`,
                 }
             }
         ])
