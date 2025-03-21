@@ -10,7 +10,7 @@ export const getNginxSites = () => {
     const out = execSync('nginx -T').toString();
     const matches = [...out.matchAll(/server_name\s+(.+?);[\s\S]*?root\s+(.+?);/g)];
 
-    const sites = matches.map(([, host, root]) => {
+    return matches.map(([, host, root]) => {
         const stats = fs.statSync(root.trim(), {throwIfNoEntry: false});
         const {uid, gid} = stats || {};
         const user = uid != null ? getUsername(uid) : '';
@@ -25,7 +25,6 @@ export const getNginxSites = () => {
         };
     });
 
-    return {sites};
 };
 
 const getUsername = (uid) => {
