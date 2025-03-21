@@ -1,0 +1,6 @@
+{
+  "sites": [
+    {"host": "test.com", "php_ver": "8.3", "sub_dir": "", "user": "test"},
+    {"host": "staging.test.com", "php_ver": "8.3", "sub_dir": "", "user": "test-staging"}
+  ]
+}
