@@ -2,6 +2,12 @@ import {execSync} from 'child_process';
 import fs from "fs";
 import {generateConfig} from "./generators.js";
 
+const allowedHosts = process.argv.slice(2);
+const filterByHost = allowedHosts.length
+    ? (host) => allowedHosts.includes(host)
+    : () => true;
+
+
 const getUsername = (uid) => {
     return execSync(`getent passwd ${uid} | cut -d: -f1`).toString().trim();
 };
@@ -25,7 +31,8 @@ const getNginxSites = () => {
             host.length > 3 &&
             /^[a-zA-Z0-9.-]+$/.test(host) &&
             !seen.has(host) &&
-            seen.add(host)
+            seen.add(host) &&
+            filterByHost(host)
         )
         .map(({host, root}) => {
             const stats = fs.statSync(root, {throwIfNoEntry: false});
