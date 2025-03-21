@@ -36,7 +36,12 @@ This repository contains a **Node.js script** that generates a working **Nginx U
 1. Clone this repository and navigate to the directory.
 2. Run the script:
    ```sh
-   node generate-config.js
+   npm install
+   npm run start
+   
+   or
+   yarn install
+   yarn start
    ```
 3. This will create a `config.json` file.
 4. Load the generated configuration into Nginx Unit:
