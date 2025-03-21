@@ -1,6 +1,8 @@
 {
+  "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "auto_nginx": "node autonginx.js"
   },
   "dependencies": {
     "config": "^3.3.12"
