@@ -2,6 +2,10 @@ import {execSync} from 'child_process';
 import fs from "fs";
 import {generateConfig} from "./generators.js";
 
+/**
+ * Filter allowed hostnames, but if empty allow them all
+ * @type {string[]}
+ */
 const allowedHosts = process.argv.slice(2);
 const filterByHost = allowedHosts.length
     ? (host) => allowedHosts.includes(host)
